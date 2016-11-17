@@ -1,10 +1,11 @@
 $(document).ready(function() {
 	function initialize() {
-		var input = document.getElementById('searchTextField');
+		const input = document.getElementById('searchTextField');
         var autocomplete = new google.maps.places.Autocomplete(input, { types: ['(cities)'], language: ['eu'] });
         google.maps.event.addListener(autocomplete, 'place_changed', function() {
-            var place = autocomplete.getPlace().formatted_address.split(', ')[0];
+            const place = autocomplete.getPlace().formatted_address.split(', ')[0];
             document.getElementById('searchTextField').value = place;
+            getWeather(place);
         });
     }
 	google.maps.event.addDomListener(window, 'load', initialize);
@@ -48,7 +49,7 @@ $(document).ready(function() {
 	}
 
 	$('.submit').click(function () {
-		var city = $('#searchTextField').val();
+		const city = $('#searchTextField').val();
 		getWeather(city);
 	});
 	

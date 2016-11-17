@@ -3,11 +3,12 @@
 	<head>
 		<title>jQuery Boilerplate</title>
 
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-		<script src="../src/jquery-ui.js"></script>
-		<script src="../src/jquery-ui.min.js"></script>
-		<script src="../src/testing_js.js"></script>
-		<script src="http://maps.googleapis.com/maps/api/js?sensor=false&libraries=places&language=en" type="text/javascript"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.js"></script>
+		<script src="../src/jquery.autocomplete.min.js"></script>
+
+		
+		<script src="../src/jquery.boilerplate.js"></script>
+		
 
 		<link href="https://fonts.googleapis.com/css?family=Muli" rel="stylesheet">
 		<link rel="stylesheet" type="text/css" href="css/style.css">
@@ -18,14 +19,15 @@
 	</script>
 		<div class="result">
                 <div class="search">
-                <input id="searchTextField" type="text" size="50" placeholder="Enter a location" autocomplete="on">
-                <input type = "button" name="submit" value="Search" id="submit" class="submit"/>
+                <input class="searchTextField" type="text" size="50" placeholder="Enter a location" autocomplete="on" autofocus>
+               
                 </div>
                 <div class="main">
                 	<div class="date"></div>
                     <div class="city"></div>
-                    <span class="temp"></span><span class="metric_temp"></span>
+                    
                     <div class="weather_image"><img src='' alt=""></div>
+                    <span class='wrap'><span class="temp"></span><span class="metric_temp"></span></span>
                     <select name="metric" class="metric">
                     	<option value="k">Kelvin</option>
                     	<option value="c">Celsius</option>
@@ -33,6 +35,8 @@
                     </select>
                 </div>
           </div>
-
+	<script>
+		$('body').weatherPlugin();
+	</script>
 	</body>
 </html>

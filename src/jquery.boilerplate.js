@@ -1,66 +1,190 @@
-/*
- *  jquery-boilerplate - v4.0.0
- *  A jump-start for jQuery plugins development.
- *  http://jqueryboilerplate.com
- *
- *  Made by Zeno Rocha
- *  Under MIT License
- */
-// the semi-colon before function invocation is a safety net against concatenated
-// scripts and/or other plugins which may not be closed properly.
 ;( function( $, window, document, undefined ) {
 
 	"use strict";
 
-		// undefined is used here as the undefined global variable in ECMAScript 3 is
-		// mutable (ie. it can be changed by someone else). undefined isn't really being
-		// passed in so we can ensure the value of it is truly undefined. In ES5, undefined
-		// can no longer be modified.
 
-		// window and document are passed through as local variable rather than global
-		// as this (slightly) quickens the resolution process and can be more efficiently
-		// minified (especially when both are regularly referenced in your plugin).
-
-		// Create the defaults once
+		
 		var pluginName = "weatherPlugin",
 			defaults = {
-
-				propertyName: "value"
+				city: null,
+				prev: 'k',
+				key: '224e0c3868331db50d9d7b56b3ab17ac',
+				allWeather: {
+					name: null,
+					temp: null,
+					weather: null,
+					country: null
+				}
 			};
 
-		function getCity() {
-			const city = $(input).val(function) {
+		var autocompleteOptions = {
+		    serviceUrl: "http://gd.geobytes.com/AutoCompleteCity?callback=?",
+		    dataType: 'jsonp',
+		    paramName: 'q',
+		    transformResult: responce => 0|| {suggestions: responce},
+		    minChars: 3,
+		    deferRequestBy: 0
+		};
 
-			}
-		}
-		function getWeather(city) {
-			const key = '224e0c3868331db50d9d7b56b3ab17ac';
-			const url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&APPID=${key}`;
-			jQuery.ajax({
-		        url: url,
-		        type: "GET",
-		        dataType: "jsonp",
-		        async: false,
-		        success: function (data) {
-		        	$(".country").html(data.sys.country);
-		            $(".city").html(data.name);
-		            $(".temp").html(Math.round(data.main.temp));
-		            $(".wind").html(data.wind.speed);
-		            $("weather_icon").html(data.weather.icon);
-        		}
- 	    	});
-		}
+		function Plugin ( el, options ) {
+		    this.el = $(el);
+		    this._name = pluginName + this.el.index();
+		    this.settings = $.extend( {}, defaults, this._name );
+		    this._defaults = defaults;
+		    this.init();
+		};
 
-
-		// A really lightweight plugin wrapper around the constructor,
-		// preventing against multiple instantiations
 		$.fn[ pluginName ] = function( options ) {
-			return this.each( function() {
+			this.each( function() {
 				if ( !$.data( this, "plugin_" + pluginName ) ) {
 					$.data( this, "plugin_" +
 						pluginName, new Plugin( this, options ) );
 				}
-			} );
+			});
+
+			return this;
 		};
+
+		$.extend(Plugin.prototype, {
+
+			init: function() {
+				this._run();
+			},
+
+			_run: function () {
+					if(this.settings.city === null) {
+						this._defaultCity();
+					}
+					let currLocation = this._setCity();
+					this._setLocation(currLocation);
+					
+					this._changeMetric();
+					
+					
+					this.settings.prev = $('.metric').val();
+					this._metricTemp(this.settings.prev);
+				
+			},
+
+			_getWeatherRender: function(city) {
+				let self = this;
+				let myvar;
+				const url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&APPID=${this.settings.key}`;
+				jQuery.ajax({
+			        url: url,
+			        type: "GET",
+			        dataType: "jsonp",
+			        async: false,
+			        success: function (data) {
+			        	self._render(data);
+		        	},
+		        	error: function () {
+		        		self.el.find('.searchTextField').html('Yay! Wrong city!')
+		        	}
+	 	    	});
+
+			},
+
+			_render: function(data) {
+				const current = this.settings.prev;
+				    	$(".city").html(data.name + ", " + data.sys.country);
+				    	const a = data.main.temp;
+				    	$(".metric_temp").html('K');
+				    	if(current === 'k') {
+				    		$(".temp").html(Math.round(a));
+				    	} else if(current === 'c') {
+				    		$(".temp").html(Math.round(a - 273));
+				    		$(".metric_temp").html('&deg;C');
+				    	} else {
+				    		$(".temp").html(Math.round((a - 273) *9/5 + 32));
+				    		$(".metric_temp").html("F");
+			    		}
+				    	$('img').attr('src', `http://openweathermap.org/img/w/${data.weather[0].icon}.png`);
+		        		this._writeDate();
+			},
+	
+			_setLocation: function(data) {
+      			this.settings.city = data.value;
+  			},
+
+			_setCity: function () {
+		    	var inp = this.el.find(".searchTextField");
+		    	const self = this;
+		    	return  new Promise(resolve => {
+		    		inp.keyup(function (e) {
+
+		        	if ((e.keyCode == 13 && e.target.value)) {
+		        		resolve (self._getWeatherRender(e.target.value.split(", ")[0]));
+		           		 
+		           		}        
+		       		});
+
+		       		if($.fn.autocomplete) {
+						autocompleteOptions.onSelect = resolve;
+          				inp.autocomplete(autocompleteOptions);
+		   		};
+		   	});
+		    },
+
+			_changeMetric: function() {
+				const self = this;
+				$(".metric").change(function() {
+					const current = $('.metric').val();
+				    self._metricRender(self.settings.prev, current);
+				    self.settings.prev = current;
+				    self._metricTemp(current);
+				});
+			},
+
+			_metricTemp: function(prev) {
+				if(prev === 'k') {
+					$(".metric_temp").html('K');
+				} else if (prev === 'c') {
+					$(".metric_temp").html('&deg;C');
+				} else if (prev === 'f') {
+					$(".metric_temp").html("F");
+				}
+			},
+
+			_writeDate: function() {
+				let d = new Date();
+				const monthes = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+				$('.date').html(monthes[d.getMonth()] + ", " + d.getDate());
+			},
+
+			_metricRender: function (prev, current) {
+
+				const degree = +$('.temp').html();
+				if(prev === 'k' && current === 'c') {
+					$('.temp').html(degree - 273);
+				} 
+				if(prev === 'k' && current === 'f') {
+					$('.temp').html(Math.round((degree - 273) * 9/5 + 32));
+				}
+				if(prev === 'c' && current === 'k') {
+					$('.temp').html(degree + 273);
+				}
+				if(prev === 'c' && current === 'f') {
+					$('.temp').html(Math.round(degree * 9/5 + 32));
+				}
+				if(prev === 'f' && current === 'c') {
+					$('.temp').html(Math.round((degree - 32) * 5/9));
+				}
+				if(prev === 'f' && current === 'k') {
+					$('.temp').html(Math.round((degree - 32) * 5/9 + 273));
+				}
+			},
+
+
+			_defaultCity: function() {
+				let self = this;
+				$.get('http://ip-api.com/json', function(response) {
+			    	self._getWeatherRender(response.city);
+				}, "jsonp");
+			}
+
+			
+
+		})
 		
-} )( jQuery, window, document );
+} )( jQuery );
