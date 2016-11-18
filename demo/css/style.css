@@ -17,6 +17,10 @@
     margin-top: 10px;
     text-align: center;
 }
+body {
+    background-size: contain;
+    background-repeat: no-repeat;
+}
 .main {
     text-align: center;color: black;
     font-size: 36px;

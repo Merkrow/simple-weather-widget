@@ -100,7 +100,10 @@
 				    		$(".metric_temp").html("F");
 			    		}
 				    	$('img').attr('src', `http://openweathermap.org/img/w/${data.weather[0].icon}.png`);
+
 		        		this._writeDate();
+		        		this._changeBgTemp(current);
+		        		this._currentBg(data);
 			},
 	
 			_setLocation: function(data) {
@@ -124,6 +127,42 @@
           				inp.autocomplete(autocompleteOptions);
 		   		};
 		   	});
+		    },
+
+		    _currentBg: function(data) {
+		    	const current = this.el.find('body');
+		    	const weather = data.weather[0].description;
+		    	console.log(data.weather[0].description);
+		    	if(weather === 'broken clouds') {
+		    		current.css('background', "url('../img/cloudy.jpg')");
+		    	} else if(weather === 'mist') {
+		    		current.css('background', "url('../img/mist.jpg')");
+		    	} else if(weather === 'clear sky' || weather === 'few clouds'
+		    		|| weather === 'scattered clouds') {
+		    		current.css('background', "url('../img/sunny.jpg')");
+		    	} else if(weather === 'light intensity drizzle' || weather === 'rain') {
+		    		current.css('background', "url('../img/rainy.jpg')");
+		    	} else {
+		    		current.css('background', "url('../img/snow.jpg')");
+		    	}
+
+		    },
+
+		    _changeBgTemp: function(prev) {
+		    	let current = +$('.temp').html();
+		    	console.log(current);
+		    	if(prev === 'k') {
+		    		current = current - 273;
+		    	} else if(prev === 'f') {
+		    		current = Math.round((current - 32) * 5/9);
+		    	}
+		    	if(current < 5) {
+		    		this.el.find('.result').css('background-color', '#44a5dd');
+		    	} else if(current > 25) {
+		    		this.el.find('.result').css('background-color', '#f01a1a');
+		    	} else {
+		    		this.el.find('.result').css('background-color', '#F5DB5C');
+		    	}
 		    },
 
 			_changeMetric: function() {
@@ -174,7 +213,6 @@
 					$('.temp').html(Math.round((degree - 32) * 5/9 + 273));
 				}
 			},
-
 
 			_defaultCity: function() {
 				let self = this;
