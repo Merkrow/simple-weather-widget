@@ -5,33 +5,13 @@
 
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.js"></script>
 		<script src="../src/jquery.autocomplete.min.js"></script>
-
-		
-		<script src="../src/jquery.boilerplate.js"></script>
+		<script src="../src/weatherPlugin.js"></script>
 		
 
 		<link href="https://fonts.googleapis.com/css?family=Muli" rel="stylesheet">
 		<link rel="stylesheet" type="text/css" href="css/style.css">
 	</head>
 	<body>
-		<div class="result">
-                <div class="search">
-                <input class="searchTextField" type="text" size="50" placeholder="Enter a location" autocomplete="on" autofocus>
-               
-                </div>
-                <div class="main">
-                	<div class="date"></div>
-                    <div class="city"></div>
-                    
-                    <div class="weather_image"><img src='' alt=""></div>
-                    <span class='wrap'><span class="temp"></span><span class="metric_temp"></span></span>
-                    <select name="metric" class="metric">
-                    	<option value="k">Kelvin</option>
-                    	<option value="c">Celsius</option>
-                    	<option value="f">Fahrenheit</option>
-                    </select>
-                </div>
-          </div>
 	<script>
 		$('html').weatherPlugin();
 	</script>
